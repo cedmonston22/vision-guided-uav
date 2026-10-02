@@ -65,3 +65,30 @@ class MarkerDetector(Node):
                 return
     
     
+def main():
+    rclpy.init()
+    node = MarkerDetector()
+    
+    t1 = threading.Thread(target=rclpy.spin, args=(node,), daemon=True)
+    t1.start()
+    
+    try:
+        while True:
+            latest_pos = node.latest
+            if latest_pos:
+                latest_x, latest_y, latest_time = latest_pos
+                print(f"x: {latest_x:.2f}, y: {latest_y:.2f}, age: {(time.monotonic() - latest_time):.3f}")
+            else:
+                print("node.latest unavailable")
+            time.sleep(.05)
+            
+    except KeyboardInterrupt:
+        pass
+        
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+         
+if __name__ == "__main__":
+    main()

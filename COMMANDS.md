@@ -27,6 +27,22 @@ cd ~/vision-guided-uav && python3 -m venv .venv && .venv/bin/pip install -r requ
 
 ## Startup
 
+### All at once
+
+Brings up SITL, marker, bridge, and `detect_marker.py` in one tmux session, with a free shell in the last pane.
+
+```bash
+~/vision-guided-uav/scripts/start_sim.sh
+```
+
+```bash
+tmux attach -t uav
+```
+
+```bash
+tmux kill-session -t uav
+```
+
 ### 1. SITL
 
 ```bash
@@ -45,7 +61,7 @@ gz service -s /world/default/create --reqtype gz.msgs.EntityFactory --reptype gz
 source /opt/ros/jazzy/setup.bash && ros2 run ros_gz_image image_bridge /world/default/model/x500_mono_cam_down_0/link/camera_link/sensor/camera/image
 ```
 
-### 3. Viewer or Detector
+### 3. Viewer, Detector, or Hold
 
 ```bash
 source /opt/ros/jazzy/setup.bash && source ~/vision-guided-uav/.venv/bin/activate && python ~/vision-guided-uav/scripts/view_camera.py
@@ -53,6 +69,12 @@ source /opt/ros/jazzy/setup.bash && source ~/vision-guided-uav/.venv/bin/activat
 
 ```bash
 source /opt/ros/jazzy/setup.bash && source ~/vision-guided-uav/.venv/bin/activate && python ~/vision-guided-uav/scripts/detect_marker.py
+```
+
+Run one detector at a time. Stop `detect_marker.py` before starting `hold_marker.py`.
+
+```bash
+source /opt/ros/jazzy/setup.bash && source ~/vision-guided-uav/.venv/bin/activate && python ~/vision-guided-uav/scripts/hold_marker.py
 ```
 
 ### 4. Flight
