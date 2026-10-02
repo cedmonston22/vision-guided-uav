@@ -54,8 +54,8 @@ class MarkerDetector(Node):
             focal = (msg.width / 2) / math.tan(HFOV / 2)
             err_x_m = err_x * alt/focal
             err_y_m = err_y * alt/focal
-            self.latest = (err_x_m, err_y_m, time.monotonic())
-            
+            if not (math.isnan(err_x_m) or math.isnan(err_y_m)):
+                self.latest = (err_x_m, err_y_m, time.monotonic())           
         detect_ms = (detect_time) * 1000
         
     def on_pose(self, msg):
