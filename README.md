@@ -107,8 +107,8 @@ Two limitations in the current implementation specifically:
 
 | Milestone | Metric | Value |
 |---|---|---|
-| M1 | Detection latency | |
-| M1 | Detection at 3m / 5m / 10m | |
+| M1 | Detection latency | 1.4 to 3.1 ms per frame at 1280x960 |
+| M1 | Detection at 3m / 5m / 10m | works at all three, 99% rate at 9.4 m |
 | M2 | Steady-state hold error | |
 | M2 | Control loop rate | |
 | M2 | Perception-to-actuation latency | |
@@ -132,3 +132,15 @@ Out of scope for now, listed because they are the natural continuations:
 
 Running record of what was tried, what the numbers were, and what broke. Kept current
 per milestone rather than reconstructed at the end.
+
+### M1, 2026-10-01
+
+ArUco detection runs in 1.4 to 3.1 ms per frame at 1280x960, and that cost is
+independent of altitude, since the detector scans the whole image regardless of how
+large the marker turns out to be. Detection confirmed at 3 m, 5 m and 10 m, with a 99%
+rate at 9.4 m where the marker is only about 29 pixels across. The camera stream ran at
+a fifth of its expected rate until the kernel UDP socket buffers, net.core.rmem_max and
+wmem_max, were raised from their 208 KB default, because each 3.5 MB frame fragments
+across thousands of UDP packets that all have to pass through them. Pixel error is
+converted to ground distance with px * altitude / focal, where focal is 539 pixels for
+this camera.
