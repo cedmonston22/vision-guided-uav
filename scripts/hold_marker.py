@@ -1,6 +1,8 @@
 import threading
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import SingleThreadedExecutor
+from rclpy.signals import SignalHandlerOptions
 from rclpy.qos import QoSProfile, HistoryPolicy, ReliabilityPolicy
 from sensor_msgs.msg import Image
 import numpy as np
@@ -63,13 +65,15 @@ class MarkerDetector(Node):
             if pose.name == MODEL_NAME:
                 self.altitude = pose.position.z
                 return
-    
-    
+
+
 def main():
-    rclpy.init()
+    rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = MarkerDetector()
-    
-    t1 = threading.Thread(target=rclpy.spin, args=(node,), daemon=True)
+    executor = SingleThreadedExecutor()
+    executor.add_node(node)
+
+    t1 = threading.Thread(target=executor.spin, daemon=True)
     t1.start()
     
     try:
@@ -86,9 +90,10 @@ def main():
         pass
         
     finally:
+        executor.shutdown()
+        t1.join(timeout=2)
         node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
+        rclpy.try_shutdown()
          
 if __name__ == "__main__":
     main()
